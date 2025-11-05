@@ -1,0 +1,35 @@
+{
+  "name": "AppbuilderService",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "@adobe/aio-sdk": "^6",
+    "@adobe/exc-app": "^1.3.0",
+    "cloudevents": "^4.0.2",
+    "node-fetch": "^2.6.0",
+    "openwhisk": "^3.21.8",
+    "regenerator-runtime": "^0.13.5",
+    "uuid": "^8.0.0"
+  },
+  "devDependencies": {
+    "eslint": "^8",
+    "eslint-plugin-jest": "^27.2.3",
+    "jest": "^29",
+    "ts-loader": "^9.5.1",
+    "typescript": "^5.5.4"
+  },
+  "scripts": {
+    "test": "jest --passWithNoTests ./test",
+    "e2e": "jest --collectCoverage=false --testRegex ./e2e",
+    "lint": "eslint --ignore-pattern web-src --no-error-on-unmatched-pattern test src actions",
+    "lint:fix": "npm run lint -- --fix",
+    "openwhisk:configure": "node configure-openwhisk.js",
+    "openwhisk:deploy": "node deploy-openwhisk.js",
+    "openwhisk:test": "node -e \"const { execSync } = require('child_process'); const wsk = process.platform === 'win32' ? 'wsk-cli/wsk.exe' : 'wsk'; execSync(`${wsk} action invoke simple-api --result`, {stdio: 'inherit'}); execSync(`${wsk} action invoke daily-cleanup --result`, {stdio: 'inherit'});\"",
+    "openwhisk:status": "node -e \"const { execSync } = require('child_process'); const wsk = process.platform === 'win32' ? 'wsk-cli/wsk.exe' : 'wsk'; execSync(`${wsk} action list && ${wsk} trigger list && ${wsk} rule list`, {stdio: 'inherit'});\"",
+    "openwhisk:logs": "node -e \"const { execSync } = require('child_process'); const wsk = process.platform === 'win32' ? 'wsk-cli/wsk.exe' : 'wsk'; execSync(`${wsk} activation poll`, {stdio: 'inherit'});\""
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

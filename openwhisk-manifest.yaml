@@ -1,0 +1,106 @@
+# OpenWhisk Manifest for Adobe Microservice
+project:
+  name: adobe-microservice
+  packages:
+    adobe-microservice:
+      license: Apache-2.0
+      version: 1.0.0
+      
+      # Actions
+      actions:
+        simple-api:
+          function: actions/simple-api/index.js
+          runtime: nodejs:18
+          web: true
+          annotations:
+            web-export: true
+            raw-http: true
+            final: true
+          limits:
+            memory: 256
+            timeout: 60000
+        
+        generic:
+          function: actions/generic/index.js
+          runtime: nodejs:18
+          web: true
+          annotations:
+            web-export: true
+            final: true
+          limits:
+            memory: 256
+            timeout: 60000
+        
+        publish-events:
+          function: actions/publish-events/index.js
+          runtime: nodejs:18
+          web: true
+          annotations:
+            web-export: true
+            final: true
+          limits:
+            memory: 256
+            timeout: 60000
+            
+        cron-job:
+          function: actions/cron-job/index.js
+          runtime: nodejs:18
+          web: true
+          annotations:
+            web-export: true
+            raw-http: true
+            final: true
+          limits:
+            memory: 256
+            timeout: 60000
+        
+        # Actual cron job handlers
+        daily-cleanup:
+          function: actions/cron-handlers/daily-cleanup.js
+          runtime: nodejs:18
+          annotations:
+            final: true
+          limits:
+            memory: 256
+            timeout: 300000
+            
+        weekly-report:
+          function: actions/cron-handlers/weekly-report.js
+          runtime: nodejs:18
+          annotations:
+            final: true
+          limits:
+            memory: 256
+            timeout: 300000
+
+      # Triggers using OpenWhisk Alarms
+      triggers:
+        daily-cleanup-trigger:
+          feed: /whisk.system/alarms/alarm
+          inputs:
+            cron: "0 2 * * *"  # Every day at 2 AM
+            timezone: "UTC"
+            maxTriggers: -1
+            
+        weekly-report-trigger:
+          feed: /whisk.system/alarms/alarm
+          inputs:
+            cron: "0 9 * * 1"  # Every Monday at 9 AM
+            timezone: "UTC"
+            maxTriggers: -1
+            
+        hourly-backup-trigger:
+          feed: /whisk.system/alarms/interval
+          inputs:
+            minutes: 60  # Every hour
+            maxTriggers: -1
+
+      # Rules to connect triggers to actions
+      rules:
+        daily-cleanup-rule:
+          trigger: daily-cleanup-trigger
+          action: daily-cleanup
+          
+        weekly-report-rule:
+          trigger: weekly-report-trigger
+          action: weekly-report
