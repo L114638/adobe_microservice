@@ -43,3 +43,19 @@ application:
             annotations:
               require-adobe-auth: false
               final: true
+          upload-to-aem:
+            function: actions/upload-to-aem/index.js
+            web: 'yes'
+            runtime: nodejs:22
+            inputs:
+              LOG_LEVEL: info
+              aemHost: http://localhost:4502
+              aemTargetPath: /content/dam/mcds
+              aemUsername: admin
+              aemPassword: admin
+              sourceFolder: ./assets/images
+            annotations:
+              require-adobe-auth: false
+              final: true
+            limits:
+              timeout: 300000  # 5 minutes for multiple file uploads
