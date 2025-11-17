@@ -49,13 +49,13 @@ application:
             runtime: nodejs:22
             inputs:
               LOG_LEVEL: info
-              aemHost: http://localhost:4502
+              aemHost: https://author-p25321-e288205.adobeaemcloud.com
               aemTargetPath: /content/dam/mcds
               aemUsername: admin
               aemPassword: admin
-              sourceFolder: ./assets/images
+              sourceFolder: ../../../../assets/images
             annotations:
               require-adobe-auth: false
               final: true
             limits:
-              timeout: 300000  # 5 minutes for multiple file uploads
+              timeout: 300000

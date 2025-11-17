@@ -1,5 +1,18 @@
+const CopyPlugin = require('copy-webpack-plugin');
+const path = require('path')
+
 module.exports = {
   devtool: 'inline-source-map',
+  plugins: [
+    new CopyPlugin({
+      patterns: [
+        {           
+          from: path.resolve(__dirname, "assets/images"),
+          to: path.resolve(__dirname, "dist/assets/images"),
+          noErrorOnMissing: false }
+      ]
+    })
+  ],
   module: {
     rules: [
       {
