@@ -11,7 +11,7 @@ jobs:
     strategy:
       max-parallel: 1
       matrix:
-        node-version: ['20']
+        node-version: ["20"]
         os: [ubuntu-latest]
     steps:
       - name: Checkout
@@ -31,16 +31,38 @@ jobs:
         uses: adobe/aio-apps-action@3.3.0
         with:
           os: ${{ matrix.os }}
-          command: oauth_sts
+          command: auth
           CLIENTID: ${{ secrets.CLIENTID_STAGE }}
           CLIENTSECRET: ${{ secrets.CLIENTSECRET_STAGE }}
           TECHNICALACCOUNTID: ${{ secrets.TECHNICALACCID_STAGE }}
           TECHNICALACCOUNTEMAIL: ${{ secrets.TECHNICALACCEMAIL_STAGE }}
           IMSORGID: ${{ secrets.IMSORGID_STAGE }}
           SCOPES: ${{ secrets.SCOPES_STAGE }}
+      - name: Generate AEM Access Token
+        id: aem_token
+        run: |
+          echo "Generating AEM access token using OAuth client credentials..."
+          RESPONSE=$(curl -s -X POST https://ims-na1.adobelogin.com/ims/token/v3 \
+            -H "Content-Type: application/x-www-form-urlencoded" \
+            -d "grant_type=client_credentials" \
+            -d "client_id=${{ secrets.CLIENTID_STAGE }}" \
+            -d "client_secret=${{ secrets.CLIENTSECRET_STAGE }}" \
+            -d "scope=${{ secrets.SCOPES_STAGE }}")
+
+          ACCESS_TOKEN=$(echo $RESPONSE | jq -r '.access_token')
+
+          if [ "$ACCESS_TOKEN" == "null" ] || [ -z "$ACCESS_TOKEN" ]; then
+            echo "❌ Failed to generate AEM access token"
+            echo "Response: $RESPONSE"
+            exit 1
+          fi
+
+          echo "✅ AEM access token generated successfully"
+          echo "AEM_ACCESS_TOKEN=$ACCESS_TOKEN" >> $GITHUB_OUTPUT
       - name: Build
         env:
           AIO_RUNTIME_NAMESPACE: ${{ secrets.AIO_RUNTIME_NAMESPACE_STAGE }}
+          AEM_ACCESS_TOKEN: ${{ steps.aem_token.outputs.AEM_ACCESS_TOKEN }}
         uses: adobe/aio-apps-action@3.3.0
         with:
           os: ${{ matrix.os }}
@@ -55,6 +77,7 @@ jobs:
           AIO_PROJECT_WORKSPACE_ID: ${{ secrets.AIO_PROJECT_WORKSPACE_ID_STAGE }}
           AIO_PROJECT_WORKSPACE_NAME: ${{ secrets.AIO_PROJECT_WORKSPACE_NAME_STAGE }}
           AIO_PROJECT_WORKSPACE_DETAILS_SERVICES: ${{ secrets.AIO_PROJECT_WORKSPACE_DETAILS_SERVICES_STAGE }}
+          AEM_ACCESS_TOKEN: ${{ steps.aem_token.outputs.AEM_ACCESS_TOKEN }}
         uses: adobe/aio-apps-action@3.3.0
         with:
           os: ${{ matrix.os }}

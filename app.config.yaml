@@ -53,7 +53,7 @@ application:
               aemTargetPath: /content/dam/mcds
               aemUsername: admin
               aemPassword: admin
-              aemBearerToken: eyJhbGciOiJSUzI1NiIsIng1dSI6Imltc19uYTEta2V5LWF0LTEuY2VyIiwia2lkIjoiaW1zX25hMS1rZXktYXQtMSIsIml0dCI6ImF0In0.eyJpZCI6IjE3NjM0NTg0NDEzNTZfMWU4NDY3N2ItOTYxMy00OWM4LWE2MjQtZDQzMDdhMTBiNzRhX3V3MiIsInR5cGUiOiJhY2Nlc3NfdG9rZW4iLCJjbGllbnRfaWQiOiJjbS1wMjUzMjEtZTI4ODIwNS1pbnRlZ3JhdGlvbi0xIiwidXNlcl9pZCI6IjJFRjAyMUFCNjhBNDQwOTQwQTQ5NUNDQ0B0ZWNoYWNjdC5hZG9iZS5jb20iLCJhcyI6Imltcy1uYTEiLCJhYV9pZCI6IjJFRjAyMUFCNjhBNDQwOTQwQTQ5NUNDQ0B0ZWNoYWNjdC5hZG9iZS5jb20iLCJjdHAiOjAsImZnIjoiWjYzVjVQRVVGTE01UURVS0ZBUVZJSEFBR009PT09PT0iLCJtb2kiOiJjNmYwMzc0MSIsImV4cGlyZXNfaW4iOiI4NjQwMDAwMCIsImNyZWF0ZWRfYXQiOiIxNzYzNDU4NDQxMzU2Iiwic2NvcGUiOiJyZWFkX3BjLmRtYV9hZW1fYW1zLG9wZW5pZCxBZG9iZUlELHJlYWRfb3JnYW5pemF0aW9ucyxhZGRpdGlvbmFsX2luZm8ucHJvamVjdGVkUHJvZHVjdENvbnRleHQifQ.VYkk1nR2FNNPmH5HLH8zclf5tw_IGZ2FYqd-jdeC6_kIQd0QkBLhU7P84zY34J2GagvK4tDvrxowhep_FeXIL4GZhkVVNc5-KvOIII_uHPEO7y_xZ69_ewJ6NEHPi7wywsYfJIBEwF5BqT9rTiou5FoIcwC8srfVLDHmZoqAPf2RchypV8qDE0qKibHr9Gl9Z3btlZmyomDurZi6RG9uhfTm5BKG17YnhTbn-ByQf8EptXTTD_olljySwg_s-zmDwnKju22zOHkFb4RVVVbMZ7WuaAqz0AEXX6_66G_FrEJsJRmu4ugbyWMcwE-dtm2aVP5MZ-CUm9lOvHu6t754UA
+              aemBearerToken: $AEM_ACCESS_TOKEN
               sourceFolder: ./assets/images
             annotations:
               require-adobe-auth: false
