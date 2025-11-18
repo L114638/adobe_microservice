@@ -1,6 +1,6 @@
 const { Core } = require('@adobe/aio-sdk')
 const { DirectBinaryUpload, DirectBinaryUploadOptions } = require('@adobe/aem-upload')
-const { errorResponse } = require('../utils')
+const { errorResponse, getBearerToken } = require('../utils')
 const fs = require('fs')
 const path = require('path')
 require('dotenv').config()
@@ -16,6 +16,7 @@ async function main(params) {
             aemUsername: params.aemUsername || 'admin',
             aemPassword: params.aemPassword || 'admin',
             sourceFolder: params.sourceFolder,
+            bearerToken: params.aemBearerToken,
             fileExtensions: params.fileExtensions || ['.jpg', '.jpeg', '.png', '.pdf']
         }
 
@@ -74,15 +75,37 @@ function scanFolder(folderPath, allowedExtensions, logger) {
     const files = []
     logger.info(folderPath,"============>");
     
+    // Debug: Log current directory structure
+    logger.info(`__dirname: ${__dirname}`)
+    logger.info(`process.cwd(): ${process.cwd()}`)
+    
+    // Try to list contents of __dirname for debugging
+    try {
+        const dirContents = fs.readdirSync(__dirname, { withFileTypes: true })
+        logger.info(`Contents of __dirname:`, dirContents.map(d => `${d.name} (${d.isDirectory() ? 'dir' : 'file'})`).join(', '))
+    } catch (err) {
+        logger.error('Cannot read __dirname:', err.message)
+    }
+    
     // Use __dirname to resolve relative to the action's location
     const fullPath = path.isAbsolute(folderPath) 
         ? folderPath 
         : path.resolve(__dirname, folderPath)
 
-    logger.info(`Scanning folder: ${fullPath}`)
+    logger.info(`Resolved scanning folder: ${fullPath}`)
+    logger.info(`Folder exists: ${fs.existsSync(fullPath)}`)
 
     if (!fs.existsSync(fullPath)) {
         logger.error(`Folder not found: ${fullPath}`)
+        
+        // Try alternative paths for debugging
+        const altPath1 = path.resolve(process.cwd(), folderPath)
+        const altPath2 = path.resolve(__dirname, '..', '..', folderPath)
+        const altPath3 = path.resolve(__dirname, 'assets', 'images')
+        logger.info(`Alt path 1 (cwd-based): ${altPath1}, exists: ${fs.existsSync(altPath1)}`)
+        logger.info(`Alt path 2 (parent-based): ${altPath2}, exists: ${fs.existsSync(altPath2)}`)
+        logger.info(`Alt path 3 (direct): ${altPath3}, exists: ${fs.existsSync(altPath3)}`)
+        
         return files
     }
 
@@ -115,8 +138,7 @@ function scanFolder(folderPath, allowedExtensions, logger) {
 
 async function uploadFilesBatch(files, config, logger) {
     const results = []
-    // const credentials = Buffer.from(`${config.aemUsername}:${config.aemPassword}`).toString('base64')
-    const credentials = "eyJhbGciOiJSUzI1NiIsIng1dSI6Imltc19uYTEta2V5LWF0LTEuY2VyIiwia2lkIjoiaW1zX25hMS1rZXktYXQtMSIsIml0dCI6ImF0In0.eyJpZCI6IjE3NjMzNzE4OTQ4NDlfNzMwN2Q3MWMtNWFjMi00MzYyLWExZTgtMThiZTQ2NjgxNjE3X3V3MiIsInR5cGUiOiJhY2Nlc3NfdG9rZW4iLCJjbGllbnRfaWQiOiJjbS1wMjUzMjEtZTI4ODIwNS1pbnRlZ3JhdGlvbi0xIiwidXNlcl9pZCI6IjJFRjAyMUFCNjhBNDQwOTQwQTQ5NUNDQ0B0ZWNoYWNjdC5hZG9iZS5jb20iLCJhcyI6Imltcy1uYTEiLCJhYV9pZCI6IjJFRjAyMUFCNjhBNDQwOTQwQTQ5NUNDQ0B0ZWNoYWNjdC5hZG9iZS5jb20iLCJjdHAiOjAsImZnIjoiWjZZM1dSVlpGTE01UURVS0ZBUVZJSEFBR009PT09PT0iLCJtb2kiOiI1NjE5MjQyYyIsImV4cGlyZXNfaW4iOiI4NjQwMDAwMCIsImNyZWF0ZWRfYXQiOiIxNzYzMzcxODk0ODQ5Iiwic2NvcGUiOiJyZWFkX3BjLmRtYV9hZW1fYW1zLG9wZW5pZCxBZG9iZUlELHJlYWRfb3JnYW5pemF0aW9ucyxhZGRpdGlvbmFsX2luZm8ucHJvamVjdGVkUHJvZHVjdENvbnRleHQifQ.Sp3pe9OPpGdslh_X6RKZBuJ2MwL1iXXAgI10TLVPOICVKM9YlIt2pFxrI8e4R_ZrGB_3SLln-KEAdCRuJ-31Yz3oNihqeZexbhV3sIdZgKzv1F2jCUJaC5oh-AMxfVVUvJPCy3YxnWWLSPJw2yD3gZlFoEGIe1L5xY6pa3F8D7Bg0P-mD-Ab3npPORmsqbSigFzZjhZXXqBzLaX7cdoHzHxVH-pM9LtfAFeRVmGKwyKM3d41BnoSdi6TCefz_KAirwLVaf2j78ECWGhMjGcj9K7u2RdXMx2UnMHS_WoG5uAx4eoIcQ_IdMlMRJUb02DRx5lc-8To_W26nFpY9SF2zw"
+    const credentials = config.bearerToken
     try {
         logger.info(`Uploading ${files.length} files in batch...`)
 

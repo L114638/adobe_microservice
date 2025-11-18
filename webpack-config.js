@@ -8,7 +8,7 @@ module.exports = {
       patterns: [
         {           
           from: path.resolve(__dirname, "assets/images"),
-          to: path.resolve(__dirname, "dist/assets/images"),
+          to: path.resolve(__dirname, "dist/application/actions/adobe_microservice/upload-to-aem-temp/assets/images"),
           noErrorOnMissing: false }
       ]
     })
