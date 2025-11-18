@@ -1,6 +1,6 @@
 const { Core } = require('@adobe/aio-sdk')
 const { DirectBinaryUpload, DirectBinaryUploadOptions } = require('@adobe/aem-upload')
-const { errorResponse, getBearerToken } = require('../utils')
+    const { errorResponse, getBearerToken } = require('../utils')
 const fs = require('fs')
 const path = require('path')
 require('dotenv').config()
@@ -22,7 +22,7 @@ async function main(params) {
 
         logger.info(`Source folder: ${config.sourceFolder}`)
         logger.info(`Target AEM path: ${config.aemHost}${config.aemTargetPath}`)
-
+        logger.info("Bearer Token: ============>",config.bearerToken);
         const filesToUpload = scanFolder(config.sourceFolder, config.fileExtensions, logger)
         logger.info(filesToUpload);
         
